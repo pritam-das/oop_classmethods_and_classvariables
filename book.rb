@@ -23,7 +23,11 @@ class Book
   end
 
   def self.overdue_books
-
+    @@on_loan.each do |overdue_books|
+      if (overdue_books.due_date < Time.now)
+        puts "#{overdue_books.title} by #{overdue_books.author} was due on #{overdue_books.due_date}"
+      end
+    end
   end
 
   def self.browse
@@ -57,7 +61,7 @@ class Book
   end
 
   def borrow
-    check = lent_out?
+    check = self.lent_out?
     if check == true
       return false
     else
@@ -65,18 +69,25 @@ class Book
       temp = self
       @@on_loan << temp
       @@on_shelf.delete(self)
-
-
        puts "The book #{self.title} has been lent out and your return date is #{@due_date}"
-      return @@on_shelf
+      return true
 
     end
 end
 
-#  def return_to_library
-
-
-#  end
+ def return_to_library
+   check = self.lent_out?
+   if check == true
+     @due_date = "N/A"
+     temp = self
+     @@on_shelf << temp
+     @@on_loan.delete(self)
+     puts "The book #{self.title} has been succesfully returned to the shelf"
+     return true
+   else
+     return false
+   end
+ end
 
   def lent_out?
     @@on_loan.each do |borrowed_books|
@@ -88,11 +99,12 @@ end
 
   end
 
+  def renew
+    @due_date = @due_date + (7*24*60*60)
+    puts "Your new return date for the book #{self.title} is #{@due_date}"
+  end  
+
 
 
 
 end
-
-kiterunner=Book.create("Kiterunner", "khaled Hosseini", 1234)
-davincicode = Book.create("the Da Vinci Code", "Dan Brown", 1234)
-heidi=Book.create("Heidi","Unknown", 1234)
